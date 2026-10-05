@@ -4,8 +4,8 @@
  * Permite a Claude gestionar toda la operación de Mocana Motors:
  * ventas, taller, inventario, clientes, finanzas y soporte.
  */
-const { Server } = require('@anthropic-ai/mcp-server-sdk');
-const { StdioServerTransport } = require('@anthropic-ai/mcp-server-sdk/server/stdio');
+const { Server } = require('@modelcontextprotocol/sdk/server/index.js');
+const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
 const axios = require('axios');
 
 const API_BASE    = process.env.MOCANA_API_URL    || 'http://localhost:3000/api';
