@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import Header       from './components/Header';
 import Footer       from './components/Footer';
+import BottomNav    from './components/BottomNav';
 import ChatWidget   from './components/ChatWidget';
 import LandingPage  from './pages/LandingPage';
 import ShopPage     from './pages/ShopPage';
@@ -20,7 +21,8 @@ export default function App() {
         <BrowserRouter>
           <div className="min-h-screen flex flex-col">
             <Header />
-            <div className="flex-1">
+            {/* pb-16 on mobile reserves space for the bottom nav */}
+            <div className="flex-1 pb-16 md:pb-0">
               <Routes>
                 <Route path="/"          element={<LandingPage />} />
                 <Route path="/shop"      element={<ShopPage />} />
@@ -33,6 +35,7 @@ export default function App() {
               </Routes>
             </div>
             <Footer />
+            <BottomNav />
             <ChatWidget />
           </div>
         </BrowserRouter>

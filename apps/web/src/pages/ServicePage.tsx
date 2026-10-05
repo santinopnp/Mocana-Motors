@@ -3,16 +3,18 @@ import axios from 'axios';
 import { WrenchScrewdriverIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
 const SERVICE_TYPES = [
-  { value: 'oil_change',            label: 'Cambio de aceite' },
-  { value: 'maintenance',           label: 'Mantenimiento preventivo' },
-  { value: 'repair',                label: 'Reparación' },
-  { value: 'technical_inspection',  label: 'Revisión técnica' },
-  { value: 'customization',         label: 'Personalización' },
-  { value: 'other',                 label: 'Otro' },
+  { value: 'oil_change',           label: 'Cambio de aceite',         emoji: '🛢️' },
+  { value: 'maintenance',          label: 'Mantenimiento preventivo',  emoji: '🔧' },
+  { value: 'repair',               label: 'Reparación',                emoji: '🔩' },
+  { value: 'technical_inspection', label: 'Revisión técnica',          emoji: '🔍' },
+  { value: 'customization',        label: 'Personalización',           emoji: '✨' },
+  { value: 'other',                label: 'Otro',                      emoji: '📋' },
 ];
 
+const inputCls = 'mt-1 w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-400 focus:bg-white bg-gray-50 transition-colors';
+
 export default function ServicePage() {
-  const [form, setForm]     = useState({ motoPlate: '', motoBrand: '', motoModel: '', motoYear: '', serviceType: 'maintenance', description: '', scheduledAt: '' });
+  const [form, setForm]       = useState({ motoPlate: '', motoBrand: '', motoModel: '', motoYear: '', serviceType: 'maintenance', description: '', scheduledAt: '' });
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
@@ -33,85 +35,112 @@ export default function ServicePage() {
 
   if (success) {
     return (
-      <div className="max-w-lg mx-auto px-4 py-24 text-center">
-        <CheckCircleIcon className="h-16 w-16 text-green-500 mx-auto mb-4" />
-        <h2 className="text-2xl font-bold mb-2">¡Servicio agendado!</h2>
-        <p className="text-gray-500">Te enviaremos una confirmación por email con los detalles.</p>
+      <div className="flex flex-col items-center justify-center py-32 px-8 text-center">
+        <CheckCircleIcon className="h-16 w-16 text-green-500 mb-4" />
+        <h2 className="text-xl font-black text-gray-900 mb-1">¡Servicio agendado!</h2>
+        <p className="text-gray-500 text-sm">Te contactaremos para confirmar fecha y hora.</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-12">
-      <div className="flex items-center gap-3 mb-8">
-        <WrenchScrewdriverIcon className="h-8 w-8 text-brand-500" />
+    <div className="max-w-lg mx-auto px-4 py-6">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-12 h-12 rounded-2xl bg-brand-50 text-brand-500 flex items-center justify-center shrink-0">
+          <WrenchScrewdriverIcon className="h-6 w-6" />
+        </div>
         <div>
-          <h1 className="text-3xl font-black">Taller Mocana Motors</h1>
-          <p className="text-gray-500 text-sm">Agenda tu servicio — te contactaremos para confirmar</p>
+          <h1 className="text-xl font-black leading-tight">Agendar taller</h1>
+          <p className="text-gray-400 text-xs">Te contactamos para confirmar</p>
         </div>
       </div>
 
-      <form onSubmit={submit} className="card space-y-5">
-        <div className="grid grid-cols-2 gap-4">
+      <form onSubmit={submit} className="space-y-4">
+        {/* Moto info */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-4">
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Tu moto</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-semibold text-gray-600">Placa *</label>
+              <input required value={form.motoPlate}
+                onChange={(e) => setForm({ ...form, motoPlate: e.target.value.toUpperCase() })}
+                placeholder="ABC123"
+                className={inputCls + ' uppercase'}
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-gray-600">Año</label>
+              <input type="number" value={form.motoYear}
+                onChange={(e) => setForm({ ...form, motoYear: e.target.value })}
+                placeholder="2022"
+                className={inputCls}
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-gray-600">Marca</label>
+              <input value={form.motoBrand}
+                onChange={(e) => setForm({ ...form, motoBrand: e.target.value })}
+                placeholder="Honda, Yamaha…"
+                className={inputCls}
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-gray-600">Modelo</label>
+              <input value={form.motoModel}
+                onChange={(e) => setForm({ ...form, motoModel: e.target.value })}
+                placeholder="CB190R, FZ25…"
+                className={inputCls}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Service type */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-3">
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Tipo de servicio *</p>
+          <div className="grid grid-cols-2 gap-2">
+            {SERVICE_TYPES.map((t) => (
+              <button
+                key={t.value}
+                type="button"
+                onClick={() => setForm({ ...form, serviceType: t.value })}
+                className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 text-sm font-medium transition-colors text-left ${
+                  form.serviceType === t.value
+                    ? 'border-brand-500 bg-brand-50 text-brand-700'
+                    : 'border-gray-100 text-gray-600 hover:border-gray-200'
+                }`}
+              >
+                <span>{t.emoji}</span> {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Description + date */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-4">
           <div>
-            <label className="text-sm font-medium text-gray-700">Placa *</label>
-            <input required value={form.motoPlate} onChange={(e) => setForm({ ...form, motoPlate: e.target.value })}
-              placeholder="ABC123"
-              className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-400 uppercase"
+            <label className="text-xs font-semibold text-gray-600">Descripción *</label>
+            <textarea required value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              placeholder="Describe el problema o servicio requerido…"
+              rows={3}
+              className={inputCls + ' resize-none'}
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-gray-700">Marca</label>
-            <input value={form.motoBrand} onChange={(e) => setForm({ ...form, motoBrand: e.target.value })}
-              placeholder="Honda, Yamaha, Suzuki..."
-              className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-400"
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium text-gray-700">Modelo</label>
-            <input value={form.motoModel} onChange={(e) => setForm({ ...form, motoModel: e.target.value })}
-              placeholder="CB190R, FZ25..."
-              className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-400"
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium text-gray-700">Año</label>
-            <input type="number" value={form.motoYear} onChange={(e) => setForm({ ...form, motoYear: e.target.value })}
-              placeholder="2022"
-              className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-400"
+            <label className="text-xs font-semibold text-gray-600">Fecha preferida</label>
+            <input type="datetime-local" value={form.scheduledAt}
+              onChange={(e) => setForm({ ...form, scheduledAt: e.target.value })}
+              className={inputCls}
             />
           </div>
         </div>
 
-        <div>
-          <label className="text-sm font-medium text-gray-700">Tipo de servicio *</label>
-          <select required value={form.serviceType} onChange={(e) => setForm({ ...form, serviceType: e.target.value })}
-            className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-400"
-          >
-            {SERVICE_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
-          </select>
-        </div>
+        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
-        <div>
-          <label className="text-sm font-medium text-gray-700">Descripción *</label>
-          <textarea required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
-            placeholder="Describe el problema o servicio requerido..."
-            rows={3}
-            className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-400 resize-none"
-          />
-        </div>
-
-        <div>
-          <label className="text-sm font-medium text-gray-700">Fecha preferida</label>
-          <input type="datetime-local" value={form.scheduledAt} onChange={(e) => setForm({ ...form, scheduledAt: e.target.value })}
-            className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-400"
-          />
-        </div>
-
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-
-        <button type="submit" disabled={loading} className="btn-primary w-full">
-          {loading ? 'Agendando…' : 'Agendar servicio'}
+        <button type="submit" disabled={loading} className="btn-primary w-full text-sm">
+          {loading ? 'Agendando…' : '📅 Agendar servicio'}
         </button>
       </form>
     </div>
