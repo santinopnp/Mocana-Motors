@@ -1,60 +1,85 @@
-import { Link, NavLink } from 'react-router-dom';
-import { ShoppingCartIcon, UserIcon, Bars3Icon } from '@heroicons/react/24/outline';
+import { Link } from 'react-router-dom';
+import { ShoppingCartIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Header() {
   const { count } = useCart();
-  const { user, logout } = useAuth();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [searching, setSearching] = useState(false);
+  const [q, setQ] = useState('');
+
+  function submitSearch(e: React.FormEvent) {
+    e.preventDefault();
+    if (q.trim()) { navigate(`/shop?search=${encodeURIComponent(q.trim())}`); setSearching(false); setQ(''); }
+  }
 
   return (
-    <header className="bg-dark-900 text-white sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <span className="text-brand-500 text-2xl">🏍️</span>
-          <span className="font-bold text-xl tracking-tight">Mocana Motors</span>
+    <header className="bg-dark-900 text-white sticky top-0 z-50 shadow-md">
+      <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2 shrink-0">
+          <span className="text-brand-500 text-xl">🏍️</span>
+          <span className="font-black text-base tracking-tight leading-none">Mocana<br /><span className="text-brand-500 text-xs font-semibold tracking-widest uppercase">Motors</span></span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-          <NavLink to="/shop" className={({ isActive }) => isActive ? 'text-brand-500' : 'text-gray-300 hover:text-white'}>Catálogo</NavLink>
-          <NavLink to="/shop?category=motorcycles" className={({ isActive }) => isActive ? 'text-brand-500' : 'text-gray-300 hover:text-white'}>Motos</NavLink>
-          <NavLink to="/shop?category=helmets" className={({ isActive }) => isActive ? 'text-brand-500' : 'text-gray-300 hover:text-white'}>Cascos</NavLink>
-          <NavLink to="/shop?category=gear" className={({ isActive }) => isActive ? 'text-brand-500' : 'text-gray-300 hover:text-white'}>Equipamiento</NavLink>
-          <NavLink to="/service" className={({ isActive }) => isActive ? 'text-brand-500' : 'text-gray-300 hover:text-white'}>Taller</NavLink>
+        {/* Desktop nav */}
+        <nav className="hidden md:flex items-center gap-6 text-sm font-medium flex-1 justify-center">
+          {[
+            { to: '/shop', label: 'Catálogo' },
+            { to: '/shop?category=motorcycles', label: 'Motos' },
+            { to: '/shop?category=helmets', label: 'Cascos' },
+            { to: '/shop?category=gear', label: 'Equipamiento' },
+            { to: '/service', label: 'Taller' },
+          ].map(({ to, label }) => (
+            <Link key={to} to={to} className="text-gray-300 hover:text-white transition-colors">{label}</Link>
+          ))}
         </nav>
 
-        <div className="flex items-center gap-4">
+        {/* Right actions */}
+        <div className="flex items-center gap-1 shrink-0">
+          {/* Search toggle */}
+          {searching ? (
+            <form onSubmit={submitSearch} className="flex items-center">
+              <input
+                autoFocus
+                value={q}
+                onChange={e => setQ(e.target.value)}
+                onBlur={() => { if (!q) setSearching(false); }}
+                placeholder="Buscar…"
+                className="bg-dark-800 text-white placeholder-gray-500 text-sm rounded-xl px-3 py-1.5 w-40 md:w-56 focus:ring-1 ring-brand-500 outline-none"
+              />
+            </form>
+          ) : (
+            <button onClick={() => setSearching(true)} className="p-2 text-gray-300 hover:text-white">
+              <MagnifyingGlassIcon className="h-5 w-5" />
+            </button>
+          )}
+
+          {/* Cart */}
           <Link to="/cart" className="relative p-2">
-            <ShoppingCartIcon className="h-6 w-6 text-gray-300 hover:text-white" />
+            <ShoppingCartIcon className="h-5 w-5 text-gray-300 hover:text-white" />
             {count > 0 && (
-              <span className="absolute -top-1 -right-1 bg-brand-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">{count}</span>
+              <span className="absolute top-0.5 right-0.5 bg-brand-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">{count > 9 ? '9+' : count}</span>
             )}
           </Link>
-          {user ? (
-            <div className="flex items-center gap-3">
-              <Link to="/account" className="text-gray-300 hover:text-white text-sm">{user.first_name}</Link>
-              {user.role === 'admin' && <Link to="/admin" className="text-brand-500 text-sm font-semibold">Admin</Link>}
-              <button onClick={logout} className="text-gray-400 hover:text-white text-sm">Salir</button>
-            </div>
-          ) : (
-            <Link to="/login" className="flex items-center gap-1 text-gray-300 hover:text-white text-sm">
-              <UserIcon className="h-5 w-5" /> Ingresar
-            </Link>
-          )}
-          <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
-            <Bars3Icon className="h-6 w-6 text-gray-300" />
-          </button>
+
+          {/* User - desktop only */}
+          <div className="hidden md:flex items-center gap-2 text-sm pl-1">
+            {user ? (
+              <>
+                <Link to="/account" className="text-gray-300 hover:text-white">{user.first_name}</Link>
+                {user.role === 'admin' && <Link to="/admin" className="text-brand-500 font-semibold text-xs">Admin</Link>}
+              </>
+            ) : (
+              <Link to="/login" className="text-gray-300 hover:text-white px-3 py-1.5 rounded-lg border border-gray-700 hover:border-gray-500 transition-colors text-xs font-medium">Ingresar</Link>
+            )}
+          </div>
         </div>
       </div>
-
-      {menuOpen && (
-        <div className="md:hidden bg-dark-800 px-4 pb-4 flex flex-col gap-3 text-sm">
-          <NavLink to="/shop" onClick={() => setMenuOpen(false)} className="text-gray-300 py-2">Catálogo</NavLink>
-          <NavLink to="/service" onClick={() => setMenuOpen(false)} className="text-gray-300 py-2">Taller</NavLink>
-        </div>
-      )}
     </header>
   );
 }
