@@ -1,11 +1,9 @@
 [build]
-  base    = "apps/web"
   command = "npm run build"
   publish = "dist"
 
 [build.environment]
-  NODE_VERSION  = "20"
-  NPM_FLAGS     = "--no-workspaces"
+  NODE_VERSION = "20"
 
 [[redirects]]
   from   = "/*"
