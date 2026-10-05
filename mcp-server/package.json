@@ -1,0 +1,15 @@
+{
+  "name": "mocana-motors-mcp-server",
+  "version": "1.0.0",
+  "description": "Claude MCP server para gestión integral de Mocana Motors — tienda de motos y accesorios",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/mcp-server-sdk": "^0.1.0",
+    "axios": "^1.7.0",
+    "pg": "^8.11.0"
+  }
+}

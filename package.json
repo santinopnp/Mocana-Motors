@@ -1,0 +1,19 @@
+{
+  "name": "mocana-motors",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tienda de motocicletas y accesorios Mocana Motors",
+  "scripts": {
+    "dev:backend": "cd apps/backend && npm run dev",
+    "dev:web": "cd apps/web && npm run dev",
+    "build:web": "cd apps/web && npm run build",
+    "docker:up": "docker-compose up",
+    "docker:down": "docker-compose down",
+    "migrate": "cd apps/backend && npm run migrate"
+  },
+  "workspaces": [
+    "apps/backend",
+    "apps/web",
+    "mcp-server"
+  ]
+}
