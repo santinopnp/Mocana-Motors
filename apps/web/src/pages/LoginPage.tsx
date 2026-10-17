@@ -28,11 +28,8 @@ export default function LoginPage() {
     <div className="min-h-[calc(100vh-56px)] flex flex-col items-center justify-center px-5 py-10">
       {/* Logo area */}
       <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-dark-900 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl shadow-lg">
-          🏍️
-        </div>
-        <h1 className="text-2xl font-black">Bienvenido</h1>
-        <p className="text-gray-400 text-sm mt-0.5">Mocana Motors</p>
+        <img src="/brand/mocana-emblem-light.svg" alt="Mocana Motors" width={200} height={106} className="w-28 h-auto mx-auto mb-4" />
+        <h1 className="display text-[28px]">Ingresa a tu cuenta</h1>
       </div>
 
       <form onSubmit={submit} className="w-full max-w-sm space-y-4">

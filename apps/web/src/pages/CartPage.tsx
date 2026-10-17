@@ -1,3 +1,4 @@
+import Icon from '../components/Icon';
 import { Link } from 'react-router-dom';
 import { TrashIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 import { useCart } from '../context/CartContext';
@@ -29,10 +30,10 @@ export default function CartPage() {
       <div className="px-4 space-y-3">
         {items.map((item) => (
           <div key={item.variantId} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-3 flex items-center gap-3">
-            <div className="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
+            <div className="w-16 h-16 bg-surface-sunken rounded-md flex items-center justify-center shrink-0 overflow-hidden">
               {item.image
                 ? <img src={item.image} className="w-full h-full object-cover" alt="" />
-                : <span className="text-2xl">🏍️</span>}
+                : <Icon name="moto" className="text-ink-3" />}
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2">{item.name}</p>

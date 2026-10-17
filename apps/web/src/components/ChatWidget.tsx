@@ -7,7 +7,7 @@ interface Message { role: 'user' | 'assistant'; content: string; }
 export default function ChatWidget() {
   const [open, setOpen]       = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: '¡Hola! Soy Moto 🏍️, tu asesor de Mocana Motors. ¿En qué te puedo ayudar hoy?' }
+    { role: 'assistant', content: 'Hola, soy Moto, tu asesor de Mocana Motors. ¿En qué te ayudo hoy?' }
   ]);
   const [input, setInput]     = useState('');
   const [loading, setLoading] = useState(false);
@@ -50,11 +50,11 @@ export default function ChatWidget() {
           style={{ height: 420 }}
         >
           {/* Header */}
-          <div className="bg-dark-900 text-white px-4 py-3 flex items-center gap-3 shrink-0">
-            <span className="text-xl">🏍️</span>
+          <div className="bg-asphalt text-white px-4 py-3 flex items-center gap-3 shrink-0">
+            <img src="/brand/mocana-badge.svg" alt="" width={32} height={32} className="w-8 h-8" />
             <div>
               <p className="font-semibold text-sm">Moto</p>
-              <p className="text-xs text-gray-400">Asistente Mocana Motors</p>
+              <p className="text-xs text-chrome">Asistente Mocana Motors</p>
             </div>
           </div>
 

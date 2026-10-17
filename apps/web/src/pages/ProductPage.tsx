@@ -1,3 +1,4 @@
+import Icon from '../components/Icon';
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -51,7 +52,7 @@ export default function ProductPage() {
         <div className="relative aspect-square bg-gray-50 md:rounded-3xl overflow-hidden">
           {product.images?.[0]
             ? <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
-            : <div className="w-full h-full flex items-center justify-center text-9xl">🏍️</div>}
+            : <div className="w-full h-full flex items-center justify-center text-ink-3 bg-surface-sunken"><Icon name="moto" size={120} strokeWidth={1.5} /></div>}
           {comparePrice && (
             <span className="absolute top-4 left-4 bg-red-500 text-white text-sm font-bold px-2.5 py-1 rounded-full">
               -{Math.round((1 - (variant?.price || product.price) / (variant?.compare_price || product.compare_price)) * 100)}%

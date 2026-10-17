@@ -21,8 +21,8 @@ export default function App() {
         <BrowserRouter>
           <div className="min-h-screen flex flex-col">
             <Header />
-            {/* pb-16 on mobile reserves space for the bottom nav */}
-            <div className="flex-1 pb-16 md:pb-0">
+            {/* pb-16 reserves space for the bottom nav below 960px */}
+            <div className="flex-1 pb-16 lg:pb-0">
               <Routes>
                 <Route path="/"          element={<LandingPage />} />
                 <Route path="/shop"      element={<ShopPage />} />

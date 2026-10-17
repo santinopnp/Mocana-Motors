@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Saira:wght@400;500;600;700&family=Titan+One&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,20 +6,30 @@
 
 @layer base {
   html { -webkit-tap-highlight-color: transparent; }
-  body { @apply bg-gray-50 text-gray-900 font-sans; }
+  body { @apply bg-surface text-ink font-sans text-base; }
   * { @apply outline-none; }
-  *:focus-visible { @apply ring-2 ring-brand-500 ring-offset-1; }
+  *:focus-visible { outline: 3px solid theme('colors.focus'); outline-offset: 2px; }
+  input, select, textarea { font-size: 16px; }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-brand-500 active:bg-brand-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors select-none min-h-[48px] flex items-center justify-center;
+    @apply bg-brand-500 hover:bg-brand-600 active:bg-brand-700 text-white font-semibold px-6 py-3 rounded-md transition-colors select-none min-h-[48px] flex items-center justify-center;
   }
   .btn-secondary {
-    @apply border-2 border-gray-200 active:border-brand-500 active:text-brand-600 text-gray-700 font-semibold px-6 py-3 rounded-xl transition-colors select-none min-h-[48px] flex items-center justify-center;
+    @apply border-2 border-ink text-ink hover:bg-ink hover:text-white font-semibold px-6 py-3 rounded-md transition-colors select-none min-h-[48px] flex items-center justify-center;
+  }
+  .btn-on-dark {
+    @apply border-2 border-chrome text-white hover:bg-white hover:text-ink font-semibold px-6 py-3 rounded-md transition-colors select-none min-h-[48px] flex items-center justify-center;
   }
   .card {
-    @apply bg-white rounded-2xl shadow-sm border border-gray-100 p-5;
+    @apply bg-surface-raised rounded-lg shadow-sm p-5;
+  }
+  .display {
+    @apply font-display font-normal uppercase leading-[1.05];
+  }
+  .eyebrow {
+    @apply font-mono text-[13px] tracking-[0.12em] uppercase;
   }
   .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
 }

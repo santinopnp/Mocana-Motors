@@ -2,41 +2,32 @@ import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
-    <footer className="hidden md:block bg-dark-900 text-gray-400 mt-auto">
-      <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-4 gap-8">
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-brand-500">🏍️</span>
-            <span className="font-bold text-white text-sm">Mocana Motors</span>
-          </div>
-          <p className="text-xs leading-relaxed">Tu tienda de motos y accesorios en Colombia.</p>
+    <footer className="bg-asphalt text-chrome mt-16">
+      <div className="max-w-content mx-auto px-4 md:px-10 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="flex flex-col gap-3">
+          <img src="/brand/mocana-stacked-dark.svg" alt="Mocana Motors" width={360} height={214} className="h-24 w-auto self-start" />
+          <p>Motos, taller y repuestos en Bucaramanga.</p>
         </div>
-        <div>
-          <h4 className="text-white font-semibold text-xs uppercase tracking-wide mb-3">Catálogo</h4>
-          <ul className="space-y-2 text-xs">
-            <li><Link to="/shop?category=motorcycles" className="hover:text-white transition-colors">Motocicletas</Link></li>
-            <li><Link to="/shop?category=helmets"     className="hover:text-white transition-colors">Cascos</Link></li>
-            <li><Link to="/shop?category=gear"        className="hover:text-white transition-colors">Equipamiento</Link></li>
-            <li><Link to="/shop?category=parts"       className="hover:text-white transition-colors">Repuestos</Link></li>
-          </ul>
+        <div className="flex flex-col gap-2">
+          <h2 className="eyebrow text-xs">Tienda</h2>
+          <Link to="/shop?category=motorcycles" className="hover:text-white">Motos</Link>
+          <Link to="/shop?category=parts" className="hover:text-white">Repuestos</Link>
+          <Link to="/shop?category=accessories" className="hover:text-white">Accesorios</Link>
         </div>
-        <div>
-          <h4 className="text-white font-semibold text-xs uppercase tracking-wide mb-3">Servicios</h4>
-          <ul className="space-y-2 text-xs">
-            <li><Link to="/service" className="hover:text-white transition-colors">Taller</Link></li>
-            <li><Link to="/account" className="hover:text-white transition-colors">Mi cuenta</Link></li>
-          </ul>
+        <div className="flex flex-col gap-2">
+          <h2 className="eyebrow text-xs">Servicio</h2>
+          <Link to="/service" className="hover:text-white">Servicio técnico</Link>
+          <Link to="/service" className="hover:text-white">Taller y mantenimiento</Link>
+          <Link to="/account" className="hover:text-white">Mi cuenta</Link>
         </div>
-        <div>
-          <h4 className="text-white font-semibold text-xs uppercase tracking-wide mb-3">Contacto</h4>
-          <ul className="space-y-2 text-xs">
-            <li>📍 Colombia</li>
-            <li>📧 hola@mocanamotors.com</li>
-            <li>📞 +57 300 000 0000</li>
-          </ul>
+        <div className="flex flex-col gap-2">
+          <h2 className="eyebrow text-xs">Contacto</h2>
+          <span className="text-white">Bucaramanga, Santander</span>
+          <a href="mailto:hola@mocanamotors.com" className="hover:text-white">hola@mocanamotors.com</a>
+          <span>+57 300 000 0000</span>
         </div>
       </div>
-      <div className="border-t border-gray-800 px-6 py-3 text-center text-xs">
+      <div className="border-t border-asphalt-raised px-4 py-4 text-center text-sm">
         © {new Date().getFullYear()} Mocana Motors. Todos los derechos reservados.
       </div>
     </footer>

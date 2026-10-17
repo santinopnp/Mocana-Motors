@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ShoppingCartIcon, CheckIcon } from '@heroicons/react/24/outline';
+import Icon from './Icon';
 import { useCart } from '../context/CartContext';
 import { useState } from 'react';
 
@@ -9,8 +9,8 @@ interface Product {
   images?: string[]; total_stock: number; category_slug?: string;
 }
 
-const fmt = (n: number) =>
-  new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(n);
+// Formato del sistema: $ 7.890.000
+const fmt = (n: number) => '$ ' + Math.round(n).toLocaleString('es-CO').replace(/,/g, '.');
 
 export default function ProductCard({ product }: { product: Product }) {
   const { add } = useCart();
@@ -28,43 +28,44 @@ export default function ProductCard({ product }: { product: Product }) {
     : null;
 
   return (
-    <Link to={`/product/${product.slug}`} className="group block bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm active:scale-[.98] transition-transform">
+    <Link to={`/product/${product.slug}`} className="group flex flex-col bg-surface-raised rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
       {/* Image */}
-      <div className="relative aspect-[4/3] bg-gray-50 overflow-hidden">
+      <div className="relative aspect-[4/3] bg-surface-sunken overflow-hidden">
         {product.images?.[0] ? (
           <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-5xl">🏍️</div>
+          <div className="w-full h-full flex items-center justify-center text-ink-3"><Icon name={product.category_slug === 'motorcycles' ? 'moto' : 'nut'} size={56} strokeWidth={1.5} /></div>
         )}
         {discount && discount > 5 && (
-          <span className="absolute top-2.5 left-2.5 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">-{discount}%</span>
+          <span className="absolute top-2.5 left-2.5 bg-brand-500 text-white text-xs font-bold px-2 py-0.5 rounded-[6px]">-{discount}%</span>
         )}
         {product.total_stock === 0 && (
-          <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
-            <span className="bg-gray-800 text-white text-xs font-semibold px-3 py-1.5 rounded-full">Agotado</span>
+          <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
+            <span className="bg-ink text-white text-xs font-semibold px-3 py-1.5 rounded-[6px]">Agotado</span>
           </div>
         )}
       </div>
 
       {/* Info */}
-      <div className="p-3">
-        <p className="text-[10px] text-brand-500 font-bold uppercase tracking-wider mb-0.5">{product.brand}</p>
-        <h3 className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2 mb-2">{product.name}</h3>
-        <div className="flex items-end justify-between gap-2">
+      <div className="p-3 md:p-4 flex flex-col flex-1">
+        <p className="font-mono text-[12px] text-ink-3 uppercase mb-0.5">{product.brand}</p>
+        <h3 className="font-bold text-ink text-base leading-tight line-clamp-2 mb-2">{product.name}</h3>
+        <div className="mt-auto flex items-end justify-between gap-2">
           <div>
-            <p className="font-black text-gray-900 text-base">{fmt(product.price)}</p>
+            <p className="font-bold text-ink text-lg tabular-nums">{fmt(product.price)}</p>
             {product.compare_price && (
-              <p className="text-xs text-gray-400 line-through leading-none">{fmt(product.compare_price)}</p>
+              <p className="text-xs text-ink-3 line-through leading-none">{fmt(product.compare_price)}</p>
             )}
           </div>
           {product.total_stock > 0 && (
             <button
               onClick={handleAdd}
-              className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
-                added ? 'bg-green-500 text-white' : 'bg-brand-500 hover:bg-brand-600 text-white'
+              aria-label={added ? 'Agregado al carrito' : 'Agregar al carrito'}
+              className={`shrink-0 w-12 h-12 rounded-md flex items-center justify-center transition-colors border-2 ${
+                added ? 'bg-[#1D7A3B] border-[#1D7A3B] text-white' : 'border-ink text-ink hover:bg-ink hover:text-white'
               }`}
             >
-              {added ? <CheckIcon className="h-4 w-4" /> : <ShoppingCartIcon className="h-4 w-4" />}
+              <Icon name={added ? 'check' : 'cart'} size={20} />
             </button>
           )}
         </div>
