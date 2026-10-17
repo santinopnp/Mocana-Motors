@@ -1,0 +1,104 @@
+/* Mocana Motors — tokens. Generado desde tokens.json del sistema de diseño. No editar a mano. */
+@font-face { font-family: 'Titan One'; src: url('./fonts/TitanOne-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Saira'; src: url('./fonts/Saira-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Saira'; src: url('./fonts/Saira-Medium.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Saira'; src: url('./fonts/Saira-SemiBold.woff2') format('woff2'); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Saira'; src: url('./fonts/Saira-Bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'IBM Plex Mono'; src: url('./fonts/IBMPlexMono-Medium.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
+
+:root, [data-theme="light"] {
+  --surface: #F3F3F1;
+  --surface-raised: #FFFFFF;
+  --surface-sunken: #E9E9E6;
+  --line: #E2E3E0;
+  --line-strong: #8A9099;
+  --ink: #0E0F11;
+  --ink-2: #2A2D33;
+  --ink-muted: #5B616B;
+  --brand: #D9241C;
+  --brand-strong: #B3121F;
+  --brand-ink: #B3121F;
+  --brand-soft: #FCE8E6;
+  --on-brand: #FFFFFF;
+  --asphalt: #0E0F11;
+  --asphalt-raised: #2A2D33;
+  --on-asphalt: #FFFFFF;
+  --on-asphalt-muted: #C5CAD1;
+  --chrome: #C5CAD1;
+  --success: #1F7A3A;
+  --success-soft: #E6F4EA;
+  --warning: #9A4A00;
+  --warning-soft: #FFF1DC;
+  --info: #1F5FAD;
+  --info-soft: #E6EFFA;
+  --danger: #B3121F;
+  --danger-soft: #FCE8E6;
+  --focus: #1F5FAD;
+  --scrim: rgba(14,15,17,0.56);
+  --link: var(--brand-ink);
+  --font-display: "Titan One", "Arial Black", Impact, sans-serif;
+  --font-sans: Saira, "Segoe UI", Roboto, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+  --touch-min: 48px;
+  --control-h: 48px;
+  --control-h-sm: 40px;
+  --topbar-h: 56px;
+  --bottomnav-h: 64px;
+  --content-max: 1200px;
+  --read-max: 680px;
+  --bp-tablet: 640px;
+  --bp-desktop: 960px;
+  --bp-wide: 1280px;
+  --shadow-1: 0 1px 2px rgba(14,15,17,0.08), 0 1px 1px rgba(14,15,17,0.04);
+  --shadow-2: 0 8px 24px rgba(14,15,17,0.12);
+  --shadow-nav: 0 -1px 0 rgba(14,15,17,0.08);
+}
+
+[data-theme="dark"] {
+  --surface: #121316;
+  --surface-raised: #1B1D21;
+  --surface-sunken: #0B0C0E;
+  --line: #2A2D33;
+  --line-strong: #757C86;
+  --ink: #F3F3F1;
+  --ink-2: #C5CAD1;
+  --ink-muted: #A2A8B1;
+  --brand: #D9241C;
+  --brand-strong: #B3121F;
+  --brand-ink: #FF6B60;
+  --brand-soft: #3A1210;
+  --on-brand: #FFFFFF;
+  --asphalt: #08090A;
+  --asphalt-raised: #1B1D21;
+  --on-asphalt: #FFFFFF;
+  --on-asphalt-muted: #C5CAD1;
+  --chrome: #C5CAD1;
+  --success: #5BD083;
+  --success-soft: #10291A;
+  --warning: #FFB15C;
+  --warning-soft: #33220D;
+  --info: #7FB2FF;
+  --info-soft: #0F2238;
+  --danger: #FF6B60;
+  --danger-soft: #3A1210;
+  --focus: #7FB2FF;
+  --scrim: rgba(0,0,0,0.64);
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.5);
+  --shadow-2: 0 8px 24px rgba(0,0,0,0.6);
+  --shadow-nav: 0 -1px 0 rgba(255,255,255,0.06);
+}

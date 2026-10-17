@@ -1,3 +1,4 @@
+import { Logo } from '../design-system';
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { ChatBubbleOvalLeftIcon, XMarkIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
@@ -51,7 +52,7 @@ export default function ChatWidget() {
         >
           {/* Header */}
           <div className="bg-asphalt text-white px-4 py-3 flex items-center gap-3 shrink-0">
-            <img src="/brand/mocana-badge.svg" alt="" width={32} height={32} className="w-8 h-8" />
+            <Logo variant="badge" height={32} label="" />
             <div>
               <p className="font-semibold text-sm">Moto</p>
               <p className="text-xs text-chrome">Asistente Mocana Motors</p>

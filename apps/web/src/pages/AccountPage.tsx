@@ -87,7 +87,7 @@ export default function AccountPage() {
             <div className="text-center py-16">
               <ShoppingBagIcon className="h-12 w-12 text-gray-200 mx-auto mb-3" />
               <p className="text-gray-400 text-sm">Aún no tienes pedidos</p>
-              <Link to="/shop" className="btn-primary text-sm mt-4 inline-flex">Ver catálogo</Link>
+              <Link to="/shop" className="mm-btn mm-btn-primary mt-4">Ver catálogo</Link>
             </div>
           ) : (
             <div className="space-y-2">
@@ -112,7 +112,7 @@ export default function AccountPage() {
             <div className="text-center py-16">
               <WrenchScrewdriverIcon className="h-12 w-12 text-gray-200 mx-auto mb-3" />
               <p className="text-gray-400 text-sm">Aún no tienes servicios de taller</p>
-              <Link to="/service" className="btn-primary text-sm mt-4 inline-flex">Agendar servicio</Link>
+              <Link to="/service" className="mm-btn mm-btn-primary mt-4">Agendar servicio</Link>
             </div>
           ) : (
             <div className="space-y-2">

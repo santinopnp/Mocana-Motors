@@ -1,45 +1,36 @@
 import type { Config } from 'tailwindcss';
 
-// Tokens del sistema de diseño Mocana Motors
+// Colores y medidas desde los tokens del sistema de diseño Mocana (src/design-system/tokens.css)
+const v = (name: string) => `var(--${name})`;
+
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
         brand: {
-          50:  '#FDECEB',
-          100: '#FAD4D2',
-          200: '#F3A9A5',
-          400: '#FF6B60',
-          500: '#D9241C',  // Rojo Mocana
-          600: '#B3121F',  // brand-ink: rojo como texto
-          700: '#8E0E18',
-          900: '#3D0709',
+          50: v('brand-soft'), 100: v('brand-soft'), 200: v('brand-soft'),
+          400: v('brand'), 500: v('brand'), 600: v('brand-ink'), 700: v('brand-strong'), 900: v('brand-strong'),
+          DEFAULT: v('brand'), ink: v('brand-ink'), strong: v('brand-strong'), soft: v('brand-soft'),
         },
-        dark: {
-          800: '#2A2D33',  // Grafito
-          900: '#0E0F11',  // Negro Asfalto
-        },
-        asphalt: { DEFAULT: '#0E0F11', raised: '#2A2D33' },
-        chrome: '#C5CAD1',
-        surface: { DEFAULT: '#F3F3F1', raised: '#FFFFFF', sunken: '#E4E4E0' },
-        ink: { DEFAULT: '#0E0F11', 2: '#2A2D33', 3: '#565B63' },
-        focus: '#2563EB',
+        dark: { 800: v('asphalt-raised'), 900: v('asphalt') },
+        asphalt: { DEFAULT: v('asphalt'), raised: v('asphalt-raised') },
+        chrome: v('chrome'),
+        surface: { DEFAULT: v('surface'), raised: v('surface-raised'), sunken: v('surface-sunken') },
+        ink: { DEFAULT: v('ink'), 2: v('ink-2'), muted: v('ink-muted') },
+        line: { DEFAULT: v('line'), strong: v('line-strong') },
+        success: v('success'), warning: v('warning'), info: v('info'), danger: v('danger'),
+        focus: v('focus'),
       },
       fontFamily: {
-        sans: ['Saira', 'system-ui', 'sans-serif'],
-        display: ['"Titan One"', 'system-ui', 'sans-serif'],
-        mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
+        sans: [v('font-sans')],
+        display: [v('font-display')],
+        mono: [v('font-mono')],
       },
-      borderRadius: {
-        md: '10px',
-        lg: '16px',
-        xl: '16px',
-        '2xl': '16px',
-        '3xl': '24px',
-      },
-      maxWidth: { content: '1200px' },
-      screens: { lg: '960px', xl: '1280px' },
+      borderRadius: { sm: v('radius-sm'), md: v('radius-md'), lg: v('radius-lg'), xl: v('radius-lg'), '2xl': v('radius-lg'), '3xl': v('radius-xl') },
+      boxShadow: { sm: v('shadow-1'), md: v('shadow-2') },
+      maxWidth: { content: v('content-max'), read: v('read-max') },
+      screens: { sm: '640px', lg: '960px', xl: '1280px' },
     },
   },
   plugins: [],

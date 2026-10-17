@@ -1,34 +1,18 @@
-import { NavLink } from 'react-router-dom';
-import Icon, { IconName } from './Icon';
+import { useLocation } from 'react-router-dom';
+import { BottomNav as MmBottomNav, IconName } from '../design-system';
 
-const ITEMS: { to: string; label: string; icon: IconName }[] = [
-  { to: '/',                          label: 'Inicio',    icon: 'home' },
-  { to: '/shop?category=motorcycles', label: 'Motos',     icon: 'moto' },
-  { to: '/service',                   label: 'Servicio',  icon: 'wrench' },
-  { to: '/shop?category=parts',       label: 'Repuestos', icon: 'nut' },
-  { to: '/account',                   label: 'Cuenta',    icon: 'user' },
+const ITEMS: { icon: IconName; label: string; href: string }[] = [
+  { icon: 'home',   label: 'Inicio',    href: '/' },
+  { icon: 'moto',   label: 'Motos',     href: '/shop?category=motorcycles' },
+  { icon: 'wrench', label: 'Servicio',  href: '/service' },
+  { icon: 'nut',    label: 'Repuestos', href: '/shop?category=parts' },
+  { icon: 'user',   label: 'Cuenta',    href: '/account' },
 ];
 
 export default function BottomNav() {
-  return (
-    <nav aria-label="Principal" className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface-raised border-t border-[#DADAD5] safe-bottom">
-      <div className="grid grid-cols-5">
-        {ITEMS.map(({ to, label, icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === '/'}
-            className={({ isActive }) =>
-              `flex flex-col items-center justify-center gap-0.5 min-h-[64px] text-[11px] transition-colors ${
-                isActive ? 'text-brand-600 font-semibold' : 'text-ink-3 font-medium'
-              }`
-            }
-          >
-            <Icon name={icon} />
-            {label}
-          </NavLink>
-        ))}
-      </div>
-    </nav>
-  );
+  const { pathname, search } = useLocation();
+  const here = pathname + search;
+  const isActive = (href: string) =>
+    href === '/' ? pathname === '/' : href.includes('?') ? here === href : pathname.startsWith(href);
+  return <MmBottomNav fixed label="Principal" items={ITEMS.map((it) => ({ ...it, active: isActive(it.href) }))} />;
 }

@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import axios from 'axios';
-import { CheckCircleIcon } from '@heroicons/react/24/outline';
+import { Alert, Button, Chip, SectionHeader, TextField, TimeSlots } from '../design-system';
 
 const SERVICE_TYPES = [
   { value: 'oil_change',           label: 'Cambio de aceite' },
@@ -11,23 +11,50 @@ const SERVICE_TYPES = [
   { value: 'other',                label: 'Otro' },
 ];
 
-const inputCls = 'mt-1 w-full border border-[#8A8F98] rounded-md px-4 min-h-[48px] py-3 text-base bg-surface-raised text-ink';
+const TIMES = ['8:00 a. m.', '9:00 a. m.', '10:00 a. m.', '11:00 a. m.', '2:00 p. m.', '3:00 p. m.', '4:00 p. m.', '5:00 p. m.'];
+
+// Próximos 5 días hábiles (lunes a sábado)
+function nextDays(n = 5) {
+  const out: { id: string; weekday: string; date: string }[] = [];
+  const d = new Date();
+  while (out.length < n) {
+    d.setDate(d.getDate() + 1);
+    if (d.getDay() === 0) continue;
+    out.push({
+      id: d.toISOString().slice(0, 10),
+      weekday: d.toLocaleDateString('es-CO', { weekday: 'short' }).replace('.', ''),
+      date: String(d.getDate()),
+    });
+  }
+  return out;
+}
+
+function toISO(day: string, time: string) {
+  const [hm, ampm] = time.split(' ');
+  let [h, m] = hm.split(':').map(Number);
+  if (ampm.startsWith('p') && h !== 12) h += 12;
+  return `${day}T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
 
 export default function ServicePage() {
-  const [form, setForm]       = useState({ motoPlate: '', motoBrand: '', motoModel: '', motoYear: '', serviceType: 'maintenance', description: '', scheduledAt: '' });
+  const days = useMemo(() => nextDays(), []);
+  const [form, setForm]       = useState({ motoPlate: '', motoBrand: '', motoModel: '', motoYear: '', serviceType: 'maintenance', description: '' });
+  const [day, setDay]         = useState(days[0].id);
+  const [time, setTime]       = useState(TIMES[1]);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
+  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setForm({ ...form, [k]: e.target.value });
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError('');
     try {
-      await axios.post('/api/service-orders', { ...form, motoYear: Number(form.motoYear) || undefined });
+      await axios.post('/api/service-orders', { ...form, motoYear: Number(form.motoYear) || undefined, scheduledAt: toISO(day, time) });
       setSuccess(true);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'No pudimos agendar tu servicio. Revisa tu conexión e inténtalo otra vez.');
+      setError(err.response?.data?.error || 'Revisa tu conexión e inténtalo otra vez.');
     } finally {
       setLoading(false);
     }
@@ -35,112 +62,53 @@ export default function ServicePage() {
 
   if (success) {
     return (
-      <div className="flex flex-col items-center justify-center py-32 px-8 text-center">
-        <CheckCircleIcon className="h-16 w-16 text-[#1D7A3B] mb-4" />
-        <h2 className="display text-[28px] mb-2">Servicio agendado</h2>
-        <p className="text-ink-3">Te escribimos para confirmar el día y la hora.</p>
+      <div className="page max-w-read py-16">
+        <Alert tone="success" title="Servicio agendado">Te escribimos por WhatsApp para confirmar el día y la hora.</Alert>
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="flex flex-col gap-1.5">
-          <span className="eyebrow text-brand-600">Servicio técnico y taller</span>
-          <h1 className="display text-[32px] lg:text-[44px]">Agenda tu servicio</h1>
-          <p className="text-ink-3">Escoge qué necesita tu moto y la hora que te sirve. Te confirmamos por WhatsApp.</p>
-        </div>
-      </div>
+    <div className="page max-w-read py-8 flex flex-col gap-6">
+      <SectionHeader as="h1" eyebrow="Servicio técnico y taller" title="Agenda tu servicio" />
+      <p className="m-0 text-ink-muted">Escoge qué necesita tu moto y la hora que te sirve. Te confirmamos por WhatsApp.</p>
 
-      <form onSubmit={submit} className="space-y-4">
-        {/* Moto info */}
-        <div className="bg-surface-raised rounded-lg p-5 md:p-6 space-y-4">
-          <p className="text-xl font-bold text-ink">Tu moto</p>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-sm font-semibold text-ink">Placa *</label>
-              <input required value={form.motoPlate}
-                onChange={(e) => setForm({ ...form, motoPlate: e.target.value.toUpperCase() })}
-                placeholder="ABC123"
-                className={inputCls + ' uppercase'}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-semibold text-ink">Año</label>
-              <input type="number" value={form.motoYear}
-                onChange={(e) => setForm({ ...form, motoYear: e.target.value })}
-                placeholder="2022"
-                className={inputCls}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-semibold text-ink">Marca</label>
-              <input value={form.motoBrand}
-                onChange={(e) => setForm({ ...form, motoBrand: e.target.value })}
-                placeholder="Honda, Yamaha…"
-                className={inputCls}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-semibold text-ink">Modelo</label>
-              <input value={form.motoModel}
-                onChange={(e) => setForm({ ...form, motoModel: e.target.value })}
-                placeholder="CB190R, FZ25…"
-                className={inputCls}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Service type */}
-        <div className="bg-surface-raised rounded-lg p-5 md:p-6 space-y-3">
-          <p className="text-xl font-bold text-ink">¿Qué necesita tu moto?</p>
-          <div className="grid grid-cols-2 gap-2">
+      <form onSubmit={submit} className="flex flex-col gap-6">
+        <fieldset className="card m-0 border-0 flex flex-col gap-4">
+          <legend className="float-left p-0 text-lg font-semibold">¿Qué necesita tu moto?</legend>
+          <div className="flex flex-wrap gap-2">
             {SERVICE_TYPES.map((t) => (
-              <button
-                key={t.value}
-                type="button"
-                aria-pressed={form.serviceType === t.value}
-                onClick={() => setForm({ ...form, serviceType: t.value })}
-                className={`flex items-center min-h-[56px] px-4 rounded-md font-semibold transition-colors text-left text-ink ${
-                  form.serviceType === t.value
-                    ? 'border-2 border-ink bg-surface-sunken'
-                    : 'border border-[#8A8F98] bg-surface-raised hover:border-ink'
-                }`}
-              >
-                {t.label}
-              </button>
+              <Chip key={t.value} selected={form.serviceType === t.value} onClick={() => setForm({ ...form, serviceType: t.value })}>{t.label}</Chip>
             ))}
           </div>
-        </div>
+        </fieldset>
 
-        {/* Description + date */}
-        <div className="bg-surface-raised rounded-lg p-5 md:p-6 space-y-4">
-          <div>
-            <label className="text-sm font-semibold text-ink">Cuéntanos qué pasa</label>
-            <textarea required value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-              placeholder="Ej. Suena al frenar y la luz delantera parpadea"
-              rows={3}
-              className={inputCls + ' resize-none'}
-            />
+        <fieldset className="card m-0 border-0 flex flex-col gap-4">
+          <legend className="float-left p-0 text-lg font-semibold">Tu moto</legend>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <TextField label="Placa" required value={form.motoPlate} placeholder="ABC12D"
+              onChange={(e) => setForm({ ...form, motoPlate: e.target.value.toUpperCase() })} />
+            <TextField label="Año" inputMode="numeric" value={form.motoYear} onChange={set('motoYear')} placeholder="2022" />
+            <TextField label="Marca" value={form.motoBrand} onChange={set('motoBrand')} placeholder="Honda, Yamaha…" />
+            <TextField label="Modelo" value={form.motoModel} onChange={set('motoModel')} placeholder="CB190R, FZ25…" />
           </div>
-          <div>
-            <label className="text-sm font-semibold text-ink">Día y hora que prefieres</label>
-            <input type="datetime-local" value={form.scheduledAt}
-              onChange={(e) => setForm({ ...form, scheduledAt: e.target.value })}
-              className={inputCls}
-            />
+          <div className="mm-field">
+            <label htmlFor="descripcion" className="mm-field-label">Cuéntanos qué pasa<span className="mm-req" aria-hidden="true"> *</span></label>
+            <div className="mm-control">
+              <textarea id="descripcion" required rows={3} className="mm-input py-3" value={form.description} onChange={set('description')}
+                placeholder="Ej. Suena al frenar y la luz delantera parpadea" />
+            </div>
           </div>
-        </div>
+        </fieldset>
 
-        {error && <p role="alert" className="text-brand-600 text-sm text-center font-medium">{error}</p>}
+        <fieldset className="card m-0 border-0 flex flex-col gap-4">
+          <legend className="float-left p-0 text-lg font-semibold">Día y hora</legend>
+          <TimeSlots days={days} slots={TIMES.map((t) => ({ time: t }))} day={day} time={time} onDayChange={setDay} onTimeChange={setTime} />
+        </fieldset>
 
-        <button type="submit" disabled={loading} className="btn-primary w-full text-[17px]">
-          {loading ? 'Agendando…' : 'Agendar servicio'}
-        </button>
+        {error && <Alert tone="danger" title="No pudimos agendar tu servicio">{error}</Alert>}
+
+        <Button type="submit" variant="primary" block loading={loading}>Agendar servicio</Button>
       </form>
     </div>
   );

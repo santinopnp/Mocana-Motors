@@ -1,3 +1,4 @@
+import { Logo } from '../design-system';
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -28,7 +29,7 @@ export default function LoginPage() {
     <div className="min-h-[calc(100vh-56px)] flex flex-col items-center justify-center px-5 py-10">
       {/* Logo area */}
       <div className="text-center mb-8">
-        <img src="/brand/mocana-emblem-light.svg" alt="Mocana Motors" width={200} height={106} className="w-28 h-auto mx-auto mb-4" />
+        <div className="flex justify-center mb-4"><Logo variant="emblem" tone="light" height={64} /></div>
         <h1 className="display text-[28px]">Ingresa a tu cuenta</h1>
       </div>
 
@@ -62,7 +63,7 @@ export default function LoginPage() {
           </div>
         )}
 
-        <button type="submit" disabled={loading} className="btn-primary w-full">
+        <button type="submit" disabled={loading} className="mm-btn mm-btn-primary mm-btn-block">
           {loading ? 'Ingresando…' : 'Ingresar'}
         </button>
 

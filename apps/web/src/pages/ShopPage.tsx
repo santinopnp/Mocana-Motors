@@ -1,26 +1,28 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
-import ProductCard from '../components/ProductCard';
-import { MagnifyingGlassIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
+import { Chip, SectionHeader, TextField, Alert, IconName } from '../design-system';
+import ProductCard, { Product } from '../components/ProductCard';
 
-const CATEGORIES = [
+const CATEGORIES: { slug: string; label: string; icon?: IconName }[] = [
   { slug: '', label: 'Todo' },
-  { slug: 'motorcycles', label: 'Motos' },
-  { slug: 'helmets', label: 'Cascos' },
-  { slug: 'gear', label: 'Equipamiento' },
-  { slug: 'parts', label: 'Repuestos' },
-  { slug: 'accessories', label: 'Accesorios' },
-  { slug: 'lubricants', label: 'Lubricantes' },
+  { slug: 'motorcycles', label: 'Motos', icon: 'moto' },
+  { slug: 'helmets', label: 'Cascos', icon: 'shield' },
+  { slug: 'gear', label: 'Equipamiento', icon: 'tag' },
+  { slug: 'parts', label: 'Repuestos', icon: 'nut' },
+  { slug: 'accessories', label: 'Accesorios', icon: 'tag' },
+  { slug: 'lubricants', label: 'Lubricantes', icon: 'oil' },
 ];
 
 export default function ShopPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading]   = useState(true);
   const [search, setSearch]     = useState(searchParams.get('search') || '');
   const category = searchParams.get('category') || '';
   const searchRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => { setSearch(searchParams.get('search') || ''); }, [searchParams]);
 
   useEffect(() => {
     clearTimeout(searchRef.current);
@@ -38,74 +40,40 @@ export default function ShopPage() {
   }, [category, search]);
 
   const currentCat = CATEGORIES.find(c => c.slug === category);
+  const title = search ? `Resultados para “${search}”` : currentCat?.slug ? currentCat.label : 'Todo el catálogo';
 
   return (
-    <div>
-      {/* Sticky search + filter bar */}
-      <div className="sticky top-14 lg:top-[72px] z-40 bg-surface border-b border-[#DADAD5]">
-        <div className="max-w-content mx-auto px-4 py-3 flex items-center gap-3">
-          <div className="flex-1 relative">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-            <input
-              type="search"
-              placeholder="Buscar por nombre o referencia"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              aria-label="Buscar por nombre o referencia"
-              className="w-full bg-surface-raised border border-[#8A8F98] rounded-md pl-9 pr-4 h-12 text-base"
-            />
-          </div>
-          <button aria-label="Filtros" className="w-12 h-12 flex items-center justify-center rounded-md bg-surface-raised border border-[#8A8F98] text-ink shrink-0">
-            <AdjustmentsHorizontalIcon className="h-5 w-5" />
-          </button>
-        </div>
-
-        {/* Category scroll */}
-        <div className="flex gap-2 overflow-x-auto px-4 pb-3 scrollbar-none">
-          {CATEGORIES.map((c) => (
-            <button
-              key={c.slug}
-              aria-pressed={category === c.slug}
-              onClick={() => { setSearchParams(c.slug ? { category: c.slug } : {}); setSearch(''); }}
-              className={`shrink-0 flex items-center min-h-[48px] px-[18px] rounded-md font-semibold transition-colors ${
-                category === c.slug
-                  ? 'bg-ink text-white border-2 border-ink'
-                  : 'bg-surface-raised text-ink border border-[#8A8F98] hover:border-ink'
-              }`}
-            >
-              {c.label}
-            </button>
-          ))}
+    <div className="page py-8 flex flex-col gap-6">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+        <SectionHeader as="h1" eyebrow="Catálogo" title={title} />
+        <div className="lg:w-[380px]">
+          <TextField label="Buscar por nombre o referencia" iconStart="search" type="search" value={search}
+            onChange={(e) => setSearch(e.target.value)} placeholder="Ej. kit de arrastre" />
         </div>
       </div>
 
-      <div className="max-w-content mx-auto px-4 py-5">
-        {/* Title */}
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="display text-[24px] lg:text-[28px]">
-            {search ? `"${search}"` : currentCat?.slug ? currentCat.label : 'Todo el catálogo'}
-          </h1>
-          {!loading && <span className="text-sm text-ink-3">{products.length} productos</span>}
-        </div>
-
-        {loading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="rounded-lg bg-surface-sunken animate-pulse aspect-[4/5]" />
-            ))}
-          </div>
-        ) : products.length === 0 ? (
-          <div className="text-center py-24 text-ink-3">
-            
-            <p className="font-semibold text-ink">No encontramos productos</p>
-            <p className="text-sm mt-1">Prueba con otra palabra, una referencia o cambia la categoría.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
-            {products.map((p: any) => <ProductCard key={p.id} product={p} />)}
-          </div>
-        )}
+      <div role="group" aria-label="Categorías" className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
+        {CATEGORIES.map((c) => (
+          <Chip key={c.slug} selected={category === c.slug} icon={c.icon}
+            onClick={() => { setSearchParams(c.slug ? { category: c.slug } : {}); setSearch(''); }}>
+            {c.label}
+          </Chip>
+        ))}
       </div>
+
+      {!loading && <p className="m-0 text-ink-muted">{products.length} {products.length === 1 ? 'producto' : 'productos'}</p>}
+
+      {loading ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+          {Array.from({ length: 8 }).map((_, i) => <div key={i} className="rounded-lg bg-surface-sunken animate-pulse aspect-[3/4]" />)}
+        </div>
+      ) : products.length === 0 ? (
+        <Alert tone="info" title="No encontramos productos">Prueba con otra palabra, una referencia o cambia la categoría.</Alert>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+          {products.map((p) => <ProductCard key={p.id} product={p} />)}
+        </div>
+      )}
     </div>
   );
 }

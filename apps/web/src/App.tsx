@@ -5,6 +5,7 @@ import Header       from './components/Header';
 import Footer       from './components/Footer';
 import BottomNav    from './components/BottomNav';
 import ChatWidget   from './components/ChatWidget';
+import SpaLinks     from './components/SpaLinks';
 import LandingPage  from './pages/LandingPage';
 import ShopPage     from './pages/ShopPage';
 import ProductPage  from './pages/ProductPage';
@@ -19,6 +20,7 @@ export default function App() {
     <AuthProvider>
       <CartProvider>
         <BrowserRouter>
+          <SpaLinks />
           <div className="min-h-screen flex flex-col">
             <Header />
             {/* pb-16 reserves space for the bottom nav below 960px */}
