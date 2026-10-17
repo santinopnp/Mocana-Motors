@@ -1,33 +1,55 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import axios from 'axios';
-import { WrenchScrewdriverIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { Alert, Button, Chip, Icon, SectionHeader, TextField, TimeSlots, type IconName } from '../design-system/ui';
 
-const SERVICE_TYPES = [
-  { value: 'oil_change',           label: 'Cambio de aceite',         emoji: '🛢️' },
-  { value: 'maintenance',          label: 'Mantenimiento preventivo',  emoji: '🔧' },
-  { value: 'repair',               label: 'Reparación',                emoji: '🔩' },
-  { value: 'technical_inspection', label: 'Revisión técnica',          emoji: '🔍' },
-  { value: 'customization',        label: 'Personalización',           emoji: '✨' },
-  { value: 'other',                label: 'Otro',                      emoji: '📋' },
+const SERVICE_TYPES: { value: string; label: string; icon: IconName }[] = [
+  { value: 'oil_change',           label: 'Cambio de aceite',         icon: 'oil' },
+  { value: 'maintenance',          label: 'Mantenimiento preventivo', icon: 'toolbox' },
+  { value: 'repair',               label: 'Reparación',               icon: 'wrench' },
+  { value: 'technical_inspection', label: 'Revisión técnica',         icon: 'search' },
+  { value: 'customization',        label: 'Personalización',          icon: 'tag' },
+  { value: 'other',                label: 'Otro',                     icon: 'chat' },
 ];
 
-const inputCls = 'mt-1 w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-400 focus:bg-white bg-gray-50 transition-colors';
+// Horario de referencia para elegir una hora preferida; el taller la confirma.
+const HOURS = ['08:00', '09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'];
+const WEEKDAYS = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
+
+function hourLabel(hhmm: string) {
+  const h = Number(hhmm.slice(0, 2));
+  return `${h > 12 ? h - 12 : h}:00 ${h < 12 ? 'a. m.' : 'p. m.'}`;
+}
+
+function nextDays(n: number) {
+  const out: { id: string; weekday: string; date: string; disabled?: boolean }[] = [];
+  const d = new Date();
+  for (let i = 1; out.length < n; i++) {
+    const day = new Date(d.getFullYear(), d.getMonth(), d.getDate() + i);
+    const id = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`;
+    out.push({ id, weekday: WEEKDAYS[day.getDay()], date: String(day.getDate()), disabled: day.getDay() === 0 });
+  }
+  return out;
+}
 
 export default function ServicePage() {
-  const [form, setForm]       = useState({ motoPlate: '', motoBrand: '', motoModel: '', motoYear: '', serviceType: 'maintenance', description: '', scheduledAt: '' });
+  const [form, setForm]       = useState({ motoPlate: '', motoBrand: '', motoModel: '', motoYear: '', serviceType: 'maintenance', description: '' });
+  const [day, setDay]         = useState<string>();
+  const [time, setTime]       = useState<string>();
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
+  const days = useMemo(() => nextDays(10), []);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError('');
     try {
-      await axios.post('/api/service-orders', { ...form, motoYear: Number(form.motoYear) || undefined });
+      const scheduledAt = day && time ? `${day}T${time}` : undefined;
+      await axios.post('/api/service-orders', { ...form, scheduledAt, motoYear: Number(form.motoYear) || undefined });
       setSuccess(true);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Error al agendar. Intenta de nuevo.');
+      setError(err.response?.data?.error || 'No pudimos agendar tu servicio. Revisa los datos e intenta de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -35,113 +57,70 @@ export default function ServicePage() {
 
   if (success) {
     return (
-      <div className="flex flex-col items-center justify-center py-32 px-8 text-center">
-        <CheckCircleIcon className="h-16 w-16 text-green-500 mb-4" />
-        <h2 className="text-xl font-black text-gray-900 mb-1">¡Servicio agendado!</h2>
-        <p className="text-gray-500 text-sm">Te contactaremos para confirmar fecha y hora.</p>
+      <div className="flex flex-col items-center justify-center py-32 px-8 text-center gap-3">
+        <span className="w-16 h-16 rounded-lg bg-success-soft text-success flex items-center justify-center"><Icon name="check" size={36} /></span>
+        <h1 className="t-display-md text-ink">Servicio agendado</h1>
+        <p className="text-ink-muted">Te contactamos para confirmar el día y la hora.</p>
+        <Button variant="secondary" to="/account">Ver mis servicios</Button>
       </div>
     );
   }
 
+  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, [k]: e.target.value });
+
   return (
-    <div className="max-w-lg mx-auto px-4 py-6">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 rounded-2xl bg-brand-50 text-brand-500 flex items-center justify-center shrink-0">
-          <WrenchScrewdriverIcon className="h-6 w-6" />
-        </div>
-        <div>
-          <h1 className="text-xl font-black leading-tight">Agendar taller</h1>
-          <p className="text-gray-400 text-xs">Te contactamos para confirmar</p>
-        </div>
-      </div>
+    <div className="mx-auto max-w-read px-4 py-6 flex flex-col gap-6">
+      <SectionHeader as="h1" eyebrow="Servicio técnico" title="Agenda tu servicio" />
 
-      <form onSubmit={submit} className="space-y-4">
-        {/* Moto info */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-4">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Tu moto</p>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs font-semibold text-gray-600">Placa *</label>
-              <input required value={form.motoPlate}
-                onChange={(e) => setForm({ ...form, motoPlate: e.target.value.toUpperCase() })}
-                placeholder="ABC123"
-                className={inputCls + ' uppercase'}
-              />
-            </div>
-            <div>
-              <label className="text-xs font-semibold text-gray-600">Año</label>
-              <input type="number" value={form.motoYear}
-                onChange={(e) => setForm({ ...form, motoYear: e.target.value })}
-                placeholder="2022"
-                className={inputCls}
-              />
-            </div>
-            <div>
-              <label className="text-xs font-semibold text-gray-600">Marca</label>
-              <input value={form.motoBrand}
-                onChange={(e) => setForm({ ...form, motoBrand: e.target.value })}
-                placeholder="Honda, Yamaha…"
-                className={inputCls}
-              />
-            </div>
-            <div>
-              <label className="text-xs font-semibold text-gray-600">Modelo</label>
-              <input value={form.motoModel}
-                onChange={(e) => setForm({ ...form, motoModel: e.target.value })}
-                placeholder="CB190R, FZ25…"
-                className={inputCls}
-              />
-            </div>
+      <form onSubmit={submit} className="flex flex-col gap-6">
+        <fieldset className="card flex flex-col gap-4">
+          <legend className="mm-eyebrow float-left mb-1">Tu moto</legend>
+          <div className="grid grid-cols-2 gap-3 clear-left">
+            <TextField label="Placa" required value={form.motoPlate} placeholder="ABC12D"
+              onChange={(e) => setForm({ ...form, motoPlate: e.target.value.toUpperCase() })}
+              className="[&_.mm-input]:font-mono [&_.mm-input]:uppercase" />
+            <TextField label="Año" type="number" inputMode="numeric" value={form.motoYear} placeholder="2022" onChange={set('motoYear')} />
+            <TextField label="Marca" value={form.motoBrand} placeholder="Honda, Yamaha…" onChange={set('motoBrand')} />
+            <TextField label="Modelo" value={form.motoModel} placeholder="CB190R, FZ25…" onChange={set('motoModel')} />
           </div>
-        </div>
+        </fieldset>
 
-        {/* Service type */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-3">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Tipo de servicio *</p>
-          <div className="grid grid-cols-2 gap-2">
+        <fieldset className="card flex flex-col gap-3">
+          <legend className="mm-eyebrow float-left mb-1">Tipo de servicio *</legend>
+          <div className="flex flex-wrap gap-2 clear-left">
             {SERVICE_TYPES.map((t) => (
-              <button
-                key={t.value}
-                type="button"
-                onClick={() => setForm({ ...form, serviceType: t.value })}
-                className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 text-sm font-medium transition-colors text-left ${
-                  form.serviceType === t.value
-                    ? 'border-brand-500 bg-brand-50 text-brand-700'
-                    : 'border-gray-100 text-gray-600 hover:border-gray-200'
-                }`}
-              >
-                <span>{t.emoji}</span> {t.label}
-              </button>
+              <Chip key={t.value} icon={t.icon} selected={form.serviceType === t.value}
+                onClick={() => setForm({ ...form, serviceType: t.value })}>
+                {t.label}
+              </Chip>
             ))}
           </div>
+          <TextField label="¿Qué le pasa a tu moto?" required multiline rows={3}
+            value={form.description}
+            placeholder="Describe el ruido, la falla o el servicio que necesitas"
+            onChange={set('description')} />
+        </fieldset>
+
+        <div className="card flex flex-col gap-3">
+          <p className="mm-eyebrow">Fecha preferida</p>
+          <TimeSlots
+            days={days}
+            slots={HOURS.map((h) => ({ time: hourLabel(h) }))}
+            day={day}
+            time={time && hourLabel(time)}
+            onDayChange={setDay}
+            onTimeChange={(label) => setTime(HOURS.find((h) => hourLabel(h) === label))}
+          />
+          {day && time && (
+            <p className="t-body-sm text-ink-muted">Elegiste {days.find((d) => d.id === day)?.weekday} {days.find((d) => d.id === day)?.date}, {hourLabel(time)}. El taller la confirma.</p>
+          )}
         </div>
 
-        {/* Description + date */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-4">
-          <div>
-            <label className="text-xs font-semibold text-gray-600">Descripción *</label>
-            <textarea required value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-              placeholder="Describe el problema o servicio requerido…"
-              rows={3}
-              className={inputCls + ' resize-none'}
-            />
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-gray-600">Fecha preferida</label>
-            <input type="datetime-local" value={form.scheduledAt}
-              onChange={(e) => setForm({ ...form, scheduledAt: e.target.value })}
-              className={inputCls}
-            />
-          </div>
-        </div>
+        {error && <Alert tone="danger" title="No se agendó">{error}</Alert>}
 
-        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-
-        <button type="submit" disabled={loading} className="btn-primary w-full text-sm">
-          {loading ? 'Agendando…' : '📅 Agendar servicio'}
-        </button>
+        <Button type="submit" block loading={loading} iconStart="calendar">
+          {loading ? 'Agendando…' : 'Agendar servicio'}
+        </Button>
       </form>
     </div>
   );

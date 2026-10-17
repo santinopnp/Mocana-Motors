@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Alert, Button, Logo, TextField } from '../design-system/ui';
 
 export default function LoginPage() {
   const { login }   = useAuth();
@@ -18,62 +19,35 @@ export default function LoginPage() {
       await login(email, password);
       navigate('/');
     } catch {
-      setError('Email o contraseña incorrectos');
+      setError('El correo o la contraseña no coinciden.');
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-[calc(100vh-56px)] flex flex-col items-center justify-center px-5 py-10">
-      {/* Logo area */}
-      <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-dark-900 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl shadow-lg">
-          🏍️
+    <div className="min-h-[calc(100vh-56px)] flex flex-col items-center justify-center px-4 py-10">
+      <div className="text-center mb-8 flex flex-col items-center gap-4">
+        <Logo variant="emblem" tone="light" height={72} />
+        <div>
+          <h1 className="t-display-lg text-ink">Ingresa</h1>
+          <p className="t-body-sm text-ink-muted mt-1">Revisa tus pedidos y el estado de tu moto.</p>
         </div>
-        <h1 className="text-2xl font-black">Bienvenido</h1>
-        <p className="text-gray-400 text-sm mt-0.5">Mocana Motors</p>
       </div>
 
-      <form onSubmit={submit} className="w-full max-w-sm space-y-4">
-        <div>
-          <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Email</label>
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="tu@email.com"
-            className="mt-1.5 w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-brand-400 focus:bg-white transition-colors"
-          />
-        </div>
-        <div>
-          <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Contraseña</label>
-          <input
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            className="mt-1.5 w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-brand-400 focus:bg-white transition-colors"
-          />
-        </div>
+      <form onSubmit={submit} className="w-full max-w-sm flex flex-col gap-4">
+        <TextField label="Correo" type="email" required autoComplete="email" iconStart="user"
+          value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@correo.com" />
+        <TextField label="Contraseña" type="password" required autoComplete="current-password"
+          value={password} onChange={(e) => setPassword(e.target.value)} />
 
-        {error && (
-          <div className="bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-4 py-3">
-            {error}
-          </div>
-        )}
+        {error && <Alert tone="danger" title="No pudimos ingresar">{error}</Alert>}
 
-        <button type="submit" disabled={loading} className="btn-primary w-full">
-          {loading ? 'Ingresando…' : 'Ingresar'}
-        </button>
+        <Button type="submit" block loading={loading}>{loading ? 'Ingresando…' : 'Ingresar'}</Button>
 
-        <p className="text-center text-sm text-gray-500">
+        <p className="text-center t-body-sm text-ink-muted">
           ¿No tienes cuenta?{' '}
-          <Link to="/register" className="text-brand-600 font-semibold hover:underline">
-            Regístrate
-          </Link>
+          <Link to="/register" className="text-brand-ink font-semibold underline underline-offset-2">Regístrate</Link>
         </p>
       </form>
     </div>

@@ -1,9 +1,15 @@
-import { Link } from 'react-router-dom';
-import { ShoppingCartIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Button, IconButton, Logo } from '../design-system/ui';
+
+const LINKS = [
+  { to: '/motos',      label: 'Motos' },
+  { to: '/service',    label: 'Servicio técnico' },
+  { to: '/repuestos',  label: 'Repuestos' },
+  { to: '/accesorios', label: 'Accesorios' },
+];
 
 export default function Header() {
   const { count } = useCart();
@@ -18,67 +24,44 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-dark-900 text-white sticky top-0 z-50 shadow-md">
-      <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 shrink-0">
-          <span className="text-brand-500 text-xl">🏍️</span>
-          <span className="font-black text-base tracking-tight leading-none">Mocana<br /><span className="text-brand-500 text-xs font-semibold tracking-widest uppercase">Motors</span></span>
-        </Link>
+    <header className="mm-tb mm-tb-dark mm-tb-web sticky top-0 z-50">
+      <Link to="/" className="mm-tb-brand" aria-label="Mocana Motors, inicio">
+        <Logo variant="horizontal" tone="dark" height={36} label="" />
+      </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium flex-1 justify-center">
-          {[
-            { to: '/shop', label: 'Catálogo' },
-            { to: '/shop?category=motorcycles', label: 'Motos' },
-            { to: '/shop?category=helmets', label: 'Cascos' },
-            { to: '/shop?category=gear', label: 'Equipamiento' },
-            { to: '/service', label: 'Taller' },
-          ].map(({ to, label }) => (
-            <Link key={to} to={to} className="text-gray-300 hover:text-white transition-colors">{label}</Link>
-          ))}
-        </nav>
+      <nav className="mm-tb-links" aria-label="Principal">
+        {LINKS.map(({ to, label }) => (
+          <NavLink key={to} to={to} className={({ isActive }) => `mm-tb-link${isActive ? ' is-active' : ''}`}>{label}</NavLink>
+        ))}
+      </nav>
 
-        {/* Right actions */}
-        <div className="flex items-center gap-1 shrink-0">
-          {/* Search toggle */}
-          {searching ? (
-            <form onSubmit={submitSearch} className="flex items-center">
-              <input
-                autoFocus
-                value={q}
-                onChange={e => setQ(e.target.value)}
-                onBlur={() => { if (!q) setSearching(false); }}
-                placeholder="Buscar…"
-                className="bg-dark-800 text-white placeholder-gray-500 text-sm rounded-xl px-3 py-1.5 w-40 md:w-56 focus:ring-1 ring-brand-500 outline-none"
-              />
-            </form>
+      <div className="mm-tb-actions">
+        {searching ? (
+          <form onSubmit={submitSearch} role="search">
+            <label htmlFor="tb-search" className="mm-sr">Buscar</label>
+            <input
+              id="tb-search"
+              autoFocus
+              type="search"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              onBlur={() => { if (!q) setSearching(false); }}
+              placeholder="Buscar motos, repuestos…"
+              className="mm-input w-44 tablet:w-64 !min-h-[40px] !bg-asphalt-raised !text-asphalt-on !border-asphalt-raised placeholder:!text-asphalt-muted"
+            />
+          </form>
+        ) : (
+          <IconButton icon="search" label="Buscar" variant="on-dark" onClick={() => setSearching(true)} />
+        )}
+        <IconButton icon="cart" label="Carrito" variant="on-dark" to="/cart" badge={count > 9 ? '9+' : count} />
+        <span className="hidden desktop:inline-flex">
+          {user ? (
+            <IconButton icon="user" label={`Cuenta de ${user.first_name}`} variant="on-dark" to={user.role === 'admin' ? '/admin' : '/account'} />
           ) : (
-            <button onClick={() => setSearching(true)} className="p-2 text-gray-300 hover:text-white">
-              <MagnifyingGlassIcon className="h-5 w-5" />
-            </button>
+            <IconButton icon="user" label="Ingresar" variant="on-dark" to="/login" />
           )}
-
-          {/* Cart */}
-          <Link to="/cart" className="relative p-2">
-            <ShoppingCartIcon className="h-5 w-5 text-gray-300 hover:text-white" />
-            {count > 0 && (
-              <span className="absolute top-0.5 right-0.5 bg-brand-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">{count > 9 ? '9+' : count}</span>
-            )}
-          </Link>
-
-          {/* User - desktop only */}
-          <div className="hidden md:flex items-center gap-2 text-sm pl-1">
-            {user ? (
-              <>
-                <Link to="/account" className="text-gray-300 hover:text-white">{user.first_name}</Link>
-                {user.role === 'admin' && <Link to="/admin" className="text-brand-500 font-semibold text-xs">Admin</Link>}
-              </>
-            ) : (
-              <Link to="/login" className="text-gray-300 hover:text-white px-3 py-1.5 rounded-lg border border-gray-700 hover:border-gray-500 transition-colors text-xs font-medium">Ingresar</Link>
-            )}
-          </div>
-        </div>
+        </span>
+        <Button size="sm" to="/service" className="mm-tb-cta">Agendar</Button>
       </div>
     </header>
   );

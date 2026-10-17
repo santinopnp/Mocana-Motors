@@ -21,11 +21,14 @@ export default function App() {
         <BrowserRouter>
           <div className="min-h-screen flex flex-col">
             <Header />
-            {/* pb-16 on mobile reserves space for the bottom nav */}
-            <div className="flex-1 pb-16 md:pb-0">
+            {/* pb-16 en móvil reserva el espacio de la navegación inferior */}
+            <div className="flex-1 pb-16 desktop:pb-0">
               <Routes>
                 <Route path="/"          element={<LandingPage />} />
                 <Route path="/shop"      element={<ShopPage />} />
+                <Route path="/motos"     element={<ShopPage baseCategory="motorcycles" />} />
+                <Route path="/repuestos" element={<ShopPage baseCategory="parts" />} />
+                <Route path="/accesorios" element={<ShopPage baseCategory="accessories" />} />
                 <Route path="/product/:slug" element={<ProductPage />} />
                 <Route path="/cart"      element={<CartPage />} />
                 <Route path="/service"   element={<ServicePage />} />

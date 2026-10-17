@@ -1,13 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
-import { ChatBubbleOvalLeftIcon, XMarkIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
+import { Icon, IconButton, Logo } from '../design-system/ui';
 
 interface Message { role: 'user' | 'assistant'; content: string; }
 
 export default function ChatWidget() {
   const [open, setOpen]       = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: '¡Hola! Soy Moto 🏍️, tu asesor de Mocana Motors. ¿En qué te puedo ayudar hoy?' }
+    { role: 'assistant', content: 'Hola, soy Moto, tu asesor de Mocana Motors. ¿En qué te ayudo hoy?' }
   ]);
   const [input, setInput]     = useState('');
   const [loading, setLoading] = useState(false);
@@ -26,7 +26,7 @@ export default function ChatWidget() {
       const { data } = await axios.post('/api/chat', { message: userMsg, sessionId: sessionId.current });
       setMessages((prev) => [...prev, { role: 'assistant', content: data.response }]);
     } catch {
-      setMessages((prev) => [...prev, { role: 'assistant', content: 'Lo siento, tuve un problema. ¿Puedes intentar de nuevo?' }]);
+      setMessages((prev) => [...prev, { role: 'assistant', content: 'Tuve un problema para responder. Intenta de nuevo en un momento.' }]);
     } finally {
       setLoading(false);
     }
@@ -34,38 +34,39 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* Floating button — above bottom nav on mobile */}
+      {/* Botón flotante — sobre la navegación inferior en móvil */}
       <button
         onClick={() => setOpen(!open)}
-        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 bg-brand-500 active:bg-brand-700 text-white rounded-full w-13 h-13 w-[52px] h-[52px] flex items-center justify-center shadow-lg shadow-brand-200 z-50 transition-colors"
-        aria-label="Abrir chat"
+        className="fixed bottom-20 right-4 desktop:bottom-6 desktop:right-6 z-50 w-14 h-14 rounded-lg bg-brand text-brand-on hover:bg-brand-strong shadow-2 flex items-center justify-center"
+        aria-label={open ? 'Cerrar chat' : 'Abrir chat con Moto'}
+        aria-expanded={open}
       >
-        {open ? <XMarkIcon className="h-6 w-6" /> : <ChatBubbleOvalLeftIcon className="h-6 w-6" />}
+        <Icon name={open ? 'close' : 'chat'} size={26} />
       </button>
 
-      {/* Chat panel */}
       {open && (
         <div
-          className="fixed bottom-36 md:bottom-24 right-4 md:right-6 w-[calc(100vw-32px)] max-w-sm bg-white rounded-2xl shadow-2xl border border-gray-100 flex flex-col z-50 overflow-hidden"
-          style={{ height: 420 }}
+          role="dialog"
+          aria-label="Chat con Moto"
+          className="fixed bottom-36 desktop:bottom-24 right-4 desktop:right-6 w-[calc(100vw-32px)] max-w-sm bg-surface-raised rounded-xl shadow-2 border border-line flex flex-col z-50 overflow-hidden"
+          style={{ height: 440 }}
         >
-          {/* Header */}
-          <div className="bg-dark-900 text-white px-4 py-3 flex items-center gap-3 shrink-0">
-            <span className="text-xl">🏍️</span>
-            <div>
-              <p className="font-semibold text-sm">Moto</p>
-              <p className="text-xs text-gray-400">Asistente Mocana Motors</p>
+          <div className="bg-asphalt text-asphalt-on pl-4 pr-1 py-2 flex items-center gap-3 shrink-0">
+            <Logo variant="badge" height={32} label="" />
+            <div className="flex-1">
+              <p className="t-title">Moto</p>
+              <p className="t-caption text-asphalt-muted">Asesor Mocana Motors</p>
             </div>
+            <IconButton icon="close" label="Cerrar chat" variant="on-dark" onClick={() => setOpen(false)} />
           </div>
 
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-3 space-y-2.5">
+          <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2.5" aria-live="polite">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] px-3 py-2 rounded-2xl text-sm leading-relaxed ${
+                <div className={`max-w-[85%] px-3 py-2 rounded-lg t-body-sm ${
                   m.role === 'user'
-                    ? 'bg-brand-500 text-white rounded-br-sm'
-                    : 'bg-gray-100 text-gray-800 rounded-bl-sm'
+                    ? 'bg-asphalt text-asphalt-on rounded-br-sm'
+                    : 'bg-surface-sunken text-ink rounded-bl-sm'
                 }`}>
                   {m.content}
                 </div>
@@ -73,32 +74,33 @@ export default function ChatWidget() {
             ))}
             {loading && (
               <div className="flex justify-start">
-                <div className="bg-gray-100 px-3 py-2 rounded-2xl rounded-bl-sm text-sm text-gray-400">
-                  <span className="animate-pulse">···</span>
+                <div className="bg-surface-sunken px-3 py-2 rounded-lg rounded-bl-sm t-body-sm text-ink-muted">
+                  <span className="animate-pulse">Escribiendo…</span>
                 </div>
               </div>
             )}
             <div ref={bottomRef} />
           </div>
 
-          {/* Input */}
-          <div className="p-3 border-t border-gray-100 flex gap-2 shrink-0">
+          <form onSubmit={(e) => { e.preventDefault(); send(); }} className="p-3 border-t border-line flex gap-2 shrink-0">
+            <label htmlFor="chat-input" className="mm-sr">Tu pregunta</label>
             <input
+              id="chat-input"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && send()}
               placeholder="Escribe tu pregunta…"
-              className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-brand-400 focus:bg-white transition-colors"
+              className="mm-input flex-1"
               disabled={loading}
             />
             <button
-              onClick={send}
+              type="submit"
               disabled={loading || !input.trim()}
-              className="bg-brand-500 active:bg-brand-700 disabled:opacity-40 text-white rounded-xl w-9 h-9 flex items-center justify-center shrink-0 transition-colors"
+              aria-label="Enviar"
+              className="mm-btn mm-btn-primary !px-0 w-12 shrink-0"
             >
-              <PaperAirplaneIcon className="h-4 w-4" />
+              <Icon name="arrow-right" size={20} />
             </button>
-          </div>
+          </form>
         </div>
       )}
     </>
